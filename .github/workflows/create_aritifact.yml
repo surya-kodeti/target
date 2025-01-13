@@ -1,0 +1,30 @@
+name: Collect and Upload Markdown Files
+
+on:
+  push:
+    branches:
+      - main  # Trigger when changes are pushed to the main branch
+  workflow_dispatch:  # Allow manual triggering of the workflow
+
+jobs:
+  collect-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the Remote Repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Collect Markdown Files
+      - name: Find and Archive Markdown Files
+        run: |
+          mkdir -p markdown_files
+          find . -name "*.md" -exec cp --parents {} markdown_files/ \;
+          zip -r markdown_files.zip markdown_files
+
+      # Step 3: Upload Artifact
+      - name: Upload Markdown Files as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: markdown-files
+          path: markdown_files.zip
